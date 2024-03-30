@@ -3,30 +3,35 @@ import numpy as np
 from matplotlib import pyplot
 import math
 
-"""
-1. Read image.
-2. Binarize.
-3. Cut.
-4. Rize.
-5. Rewrite using pixel styles.
-6.
-"""
 
 def set_pixel_style(img):
-    pixel = 255 + np.zeros((5,5))
+
+    pixel = 255 + np.zeros((9,9))
+
+    pl = pixel.shape[0]
+
+    pixel[0,0] = 0
+    pixel[0,pl-1] = 0
+    pixel[pl-1,0] = 0
+    pixel[pl-1,pl-1] = 0
+
+    
+    sl = 1
+
     lx = img.shape[1]
     ly = img.shape[0]
+
     for y in range(ly):
         for x in range(lx):
             s = img[y, x]
             if x == 0:
-                row = cv2.hconcat([np.zeros((5,1)), pixel*s, np.zeros((5,1))])
+                row = cv2.hconcat([np.zeros((pl,sl)), pixel*s, np.zeros((pl,sl))])
             else:
-                row = cv2.hconcat([row, pixel*s, np.zeros((5,1))])
+                row = cv2.hconcat([row, pixel*s, np.zeros((pl,sl))])
         if y == 0:
-            pxl_img = cv2.vconcat([np.zeros((1,row.shape[1])), row, np.zeros((1,row.shape[1]))])
+            pxl_img = cv2.vconcat([np.zeros((sl,row.shape[1])), row, np.zeros((sl,row.shape[1]))])
         else:
-            pxl_img = cv2.vconcat([pxl_img, row, np.zeros((1,row.shape[1]))])
+            pxl_img = cv2.vconcat([pxl_img, row, np.zeros((sl,row.shape[1]))])
     return pxl_img
 
 def scale_image(img, reduction_factor):
@@ -55,13 +60,13 @@ def read_image(filename):
 
 def main():
     # Read image.
-    img = read_image("rose.png")
+    img = read_image("Team RWBY Symbols V2.png")
     bin_img = binarize_image(img)
     # crop_img = autocrop_image(bin_img)
-    sc_img = scale_image(bin_img, 40)
+    sc_img = scale_image(bin_img, 10)
     pxl_img = set_pixel_style(sc_img)
 
-    new_image = cv2.merge([pxl_img*0, pxl_img*0, pxl_img])
+    new_image = cv2.merge([pxl_img, pxl_img, pxl_img])
 
     cv2.imshow("Grayscale Image", new_image)
     cv2.waitKey(0)
